@@ -83,6 +83,3 @@ This app allows users to discover popular movies, search them, and manage their 
 
 ---
 
-##  Notes
-
-This project is submitted as part of a graded Flutter Mobile Development assignment.
