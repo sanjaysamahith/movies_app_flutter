@@ -8,11 +8,11 @@ This app allows users to discover popular movies, search them, and manage their 
 
 ## Features
 
-- Fetches and displays **popular movies** from TMDB API
+- Fetches and displays **popular movies** from the TMDB API
 - Supports **real-time search**
-- Allows users to add/remove movies to:
-  -  **Favourites**
-  -  **Watchlist**
+- Allows users to add or remove movies to:
+  - Favourites
+  - Watchlist
 - Movie Details Screen includes:
   - Movie Banner
   - Movie Name
@@ -20,34 +20,36 @@ This app allows users to discover popular movies, search them, and manage their 
   - Release Date
   - Genre
   - Circular User Rating Indicator
-  -  **Play Now button with in-app notification**
+  - “Play Now” button with in-app notification
 - Handles:
   - Loading State
   - Empty State
   - Error State
 - Responsive UI for common phone sizes
-- Clean typography and spacing
+- Consistent typography and spacing
 
 ---
 
-##  Setup Instructions
+## Setup Instructions
 
-1. Install **Flutter SDK**
-   - https://docs.flutter.dev/get-started/install
+1. Install **Flutter SDK**  
+   https://docs.flutter.dev/get-started/install
 
 2. Install either:
-   - **Android Studio** or
-   - **VS Code with Flutter Extension**
+   - **Android Studio**
+   - or **VS Code with Flutter Extension**
 
-3. Clone this repository
-    git clone https://github.com/sanjaysamahith/movies_app_flutter.git
-    cd movies_app_flutter
+3. Clone this repository:
+   git clone https://github.com/sanjaysamahith/movies_app_flutter.git
+   cd movies_app_flutter
 
-4. Get Flutter packages
-    flutter pub get 
-
-5. Run the application
----
+4. Get Flutter packages:
+   flutter pub get
+   
+5. Run the application: 
+   flutter run
+   
+   ---
 
 ## Dependencies Used
 
@@ -61,25 +63,22 @@ This app allows users to discover popular movies, search them, and manage their 
 
 ## Assumptions
 
-- A valid **TMDB API Key** is used inside `tmdb_service.dart`
+- A valid **TMDB API key** is configured inside `tmdb_service.dart`
 - Internet connection is required to fetch movies
 - Designed primarily for Android & iOS mobile devices
 
 ---
 
-##  Screens Included
+## Screens Included
 
 - Movies Listing Screen
-- Search Bar
+- Search Screen
 - Movie Details Screen
 - Favourites Screen
 - Watchlist Screen
 
 ---
 
-##  Author
+## Author
 
 **Sanjay Samahith**
-
----
-

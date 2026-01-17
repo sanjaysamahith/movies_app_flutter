@@ -127,7 +127,7 @@ class _MoviesScreenState extends State<MoviesScreen> {
           childAspectRatio: 0.65,
         ),
         itemBuilder: (context, index) {
-          /// 🔴 EMPTY SEARCH STATE
+          ///  EMPTY SEARCH STATE
           if (filteredMovies.isEmpty) {
             return Center(
               child: Column(
