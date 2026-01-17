@@ -93,6 +93,8 @@ class _MoviesScreenState extends State<MoviesScreen> {
             },
 
             child: Card(
+              color: Colors.white,
+              elevation: 3,
               child: Column(
                 children: [
                   Image.network(
@@ -117,6 +119,7 @@ class _MoviesScreenState extends State<MoviesScreen> {
                           provider.favourites.contains(movie)
                               ? Icons.favorite
                               : Icons.favorite_border,
+                          color: Colors.redAccent,
                         ),
                         onPressed: () {
                           provider.addFavourite(movie);
@@ -128,6 +131,7 @@ class _MoviesScreenState extends State<MoviesScreen> {
                           provider.watchlist.contains(movie)
                               ? Icons.watch_later
                               : Icons.watch_later_outlined,
+                          color: Colors.blueAccent,
                         ),
                         onPressed: () {
                           provider.addWatchlist(movie);

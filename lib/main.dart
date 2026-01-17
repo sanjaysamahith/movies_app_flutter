@@ -17,9 +17,17 @@ class MoviesApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
+      home: const SplashScreen(),
+
+      theme: ThemeData(
+        scaffoldBackgroundColor: const Color(0xFFE3F2FD), // Light Blue Background
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF64B5F6), // Soft Blue AppBar
+          foregroundColor: Colors.white,
+        ),
+      ),
     );
   }
 }
