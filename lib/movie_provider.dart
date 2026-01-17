@@ -4,17 +4,29 @@ class MovieProvider extends ChangeNotifier {
   List favourites = [];
   List watchlist = [];
 
-  void addFavourite(movie) {
-    if (!favourites.contains(movie)) {
-      favourites.add(movie);
-      notifyListeners();
-    }
+  bool isFavourite(dynamic movie) {
+    return favourites.any((m) => m['id'] == movie['id']);
   }
 
-  void addWatchlist(movie) {
-    if (!watchlist.contains(movie)) {
-      watchlist.add(movie);
-      notifyListeners();
+  bool isInWatchlist(dynamic movie) {
+    return watchlist.any((m) => m['id'] == movie['id']);
+  }
+
+  void toggleFavourite(dynamic movie) {
+    if (isFavourite(movie)) {
+      favourites.removeWhere((m) => m['id'] == movie['id']);
+    } else {
+      favourites.add(movie);
     }
+    notifyListeners();
+  }
+
+  void toggleWatchlist(dynamic movie) {
+    if (isInWatchlist(movie)) {
+      watchlist.removeWhere((m) => m['id'] == movie['id']);
+    } else {
+      watchlist.add(movie);
+    }
+    notifyListeners();
   }
 }

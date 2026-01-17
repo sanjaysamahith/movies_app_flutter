@@ -17,6 +17,8 @@ class _MoviesScreenState extends State<MoviesScreen> {
   List movies = [];
   List filteredMovies = [];
   bool isLoading = true;
+  String? errorMessage;
+  String searchQuery = "";
 
   @override
   void initState() {
@@ -24,90 +26,190 @@ class _MoviesScreenState extends State<MoviesScreen> {
     loadMovies();
   }
 
-  void loadMovies() async {
-    final result = await tmdbService.fetchMovies();
-    setState(() {
-      movies = result;
-      filteredMovies = result;
-      isLoading = false;
-    });
+  Future<void> loadMovies() async {
+    try {
+      final data = await tmdbService.fetchMovies();
+      setState(() {
+        movies = data;
+        filteredMovies = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = "Failed to load movies";
+        isLoading = false;
+      });
+    }
   }
 
   void searchMovies(String query) {
-    final results = movies.where((movie) {
-      return movie["title"].toLowerCase().contains(query.toLowerCase());
-    }).toList();
-
     setState(() {
-      filteredMovies = results;
+      searchQuery = query;
+      filteredMovies = movies
+          .where((movie) => movie['title']
+          .toString()
+          .toLowerCase()
+          .contains(query.toLowerCase()))
+          .toList();
     });
+  }
+
+  String getGenres(List ids) {
+    Map<int, String> genres = {
+      28: "Action",
+      12: "Adventure",
+      16: "Animation",
+      35: "Comedy",
+      80: "Crime",
+      18: "Drama",
+      14: "Fantasy",
+      27: "Horror",
+      10749: "Romance",
+      878: "Sci-Fi",
+      53: "Thriller",
+    };
+    return ids.map((id) => genres[id] ?? "").join(", ");
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<MovieProvider>(context);
 
-    if (isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Movies"),
+
+        leading: filteredMovies.isEmpty && searchQuery.isNotEmpty
+            ? IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            setState(() {
+              searchQuery = "";
+              filteredMovies = movies;
+            });
+          },
+        )
+            : null,
+
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(50),
           child: Padding(
             padding: const EdgeInsets.all(8),
             child: TextField(
               onChanged: searchMovies,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: "Search movies...",
+                prefixIcon: const Icon(Icons.search),
                 filled: true,
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10)),
               ),
             ),
           ),
         ),
       ),
 
-      body: GridView.builder(
-        padding: const EdgeInsets.all(8),
-        itemCount: filteredMovies.length,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+
+          : errorMessage != null
+          ? Center(child: Text(errorMessage!))
+
+          : GridView.builder(
+        padding: const EdgeInsets.all(12),
+        itemCount:
+        filteredMovies.isEmpty ? 1 : filteredMovies.length,
+        gridDelegate:
+        const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
           childAspectRatio: 0.65,
         ),
-
         itemBuilder: (context, index) {
+          /// 🔴 EMPTY SEARCH STATE
+          if (filteredMovies.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("No movies found"),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        searchQuery = "";
+                        filteredMovies = movies;
+                      });
+                    },
+                    child: const Text("Back to Movies"),
+                  ),
+                ],
+              ),
+            );
+          }
+
           final movie = filteredMovies[index];
+          bool isFav = provider.favourites.contains(movie);
+          bool isWatch = provider.watchlist.contains(movie);
+          double rating = (movie["vote_average"] ?? 0) / 10;
 
           return GestureDetector(
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => MovieDetailsScreen(movie: movie),
+                  builder: (_) =>
+                      MovieDetailsScreen(movie: movie),
                 ),
               );
             },
-
             child: Card(
-              color: Colors.white,
-              elevation: 3,
+              elevation: 4,
               child: Column(
                 children: [
-                  Image.network(
-                    "https://image.tmdb.org/t/p/w500${movie["poster_path"]}",
-                    height: 180,
-                    fit: BoxFit.cover,
+                  Expanded(
+                    child: Image.network(
+                      "https://image.tmdb.org/t/p/w500${movie['poster_path']}",
+                      fit: BoxFit.cover,
+                    ),
                   ),
 
                   Padding(
                     padding: const EdgeInsets.all(6),
                     child: Text(
-                      movie["title"],
+                      movie['title'],
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
+                    ),
+                  ),
+
+                  Text(
+                    getGenres(movie["genre_ids"] ?? []),
+                    style: const TextStyle(
+                        fontSize: 12, color: Colors.grey),
+                  ),
+
+                  const SizedBox(height: 6),
+
+                  SizedBox(
+                    height: 50,
+                    width: 50,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        CircularProgressIndicator(
+                          value: rating,
+                          strokeWidth: 5,
+                        ),
+                        Text(
+                          "${(rating * 100).toStringAsFixed(0)}%",
+                          style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
                     ),
                   ),
 
@@ -116,26 +218,23 @@ class _MoviesScreenState extends State<MoviesScreen> {
                     children: [
                       IconButton(
                         icon: Icon(
-                          provider.favourites.contains(movie)
+                          isFav
                               ? Icons.favorite
                               : Icons.favorite_border,
                           color: Colors.redAccent,
                         ),
-                        onPressed: () {
-                          provider.addFavourite(movie);
-                        },
+                        onPressed: () =>
+                            provider.toggleFavourite(movie),
                       ),
-
                       IconButton(
                         icon: Icon(
-                          provider.watchlist.contains(movie)
+                          isWatch
                               ? Icons.watch_later
                               : Icons.watch_later_outlined,
                           color: Colors.blueAccent,
                         ),
-                        onPressed: () {
-                          provider.addWatchlist(movie);
-                        },
+                        onPressed: () =>
+                            provider.toggleWatchlist(movie),
                       ),
                     ],
                   ),
